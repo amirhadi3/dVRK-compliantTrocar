@@ -40,7 +40,6 @@ classdef shaft
             obj.Ixx = 1/4*pi*(obj.ro^4-obj.ri^4);
             obj.Iyy = 1/4*pi*(obj.ro^4-obj.ri^4);
             obj.Izz = 1/2*pi*(obj.ro^4-obj.ri^4);
-            obj.Area = pi*(obj.ro^2-obj.ri^2);
         end
         function obj = ft_to_csF(obj,ft,colLs,Lp)
             % n is the number of measrement points
@@ -53,12 +52,23 @@ classdef shaft
             obj.Lp = Lp;
             for counter = 1:numel(colLs)
                 ls = obj.Ls(counter);
-                c = 6*obj.E*obj.Ixx/obj.ks;
-                g = ls^2/(c+2*ls^3);
-                F11 = 1 - (3*obj.L-ls)*g;
-                F15 = -3*g;
-                F42 = (3*obj.L-ls)*(ls-Lp)*g-(obj.L-Lp);
-                F44 = 1-3*(ls-Lp)*g;
+                cx = 6*obj.E*obj.Ixx/obj.ks;
+                cy = 6*obj.E*obj.Iyy/obj.ks;
+                
+                gx = ls^2/(cx+2*ls^3);
+                gy = ls^2/(cy+2*ls^3);
+                
+                F11 = 1 - (3*obj.L-ls)*gy;
+                F15 = -3*gy;
+                
+                F22 = 1 - (3*obj.L-ls)*gx;
+                F24 = 3*gx;
+                
+                F42 = (3*obj.L-ls)*(ls-Lp)*gx-(obj.L-Lp);
+                F44 = 1-3*(ls-Lp)*gx;
+                
+                F51 = (obj.L-Lp)-(3*obj.L-ls)*(ls-Lp)*gy;
+                F55 = 1-3*(ls-Lp)*gy;
                 omega = [0 1;-1 0];
                 %{
                 B is a 6 by 6 matrix mapping forces at the tip to
@@ -67,11 +77,13 @@ classdef shaft
                 F(6x1) = B(6x6) * ft(6x1)
                 F(nx6) = ft(nx6) * B(6x6)'
                 %}
-                B = [F11*eye(2) zeros(2,1) F15*omega zeros(2,1);
-                    zeros(1,2) 1 zeros(1,3);
-                    F42*omega zeros(2,1) F44*eye(2) zeros(2,1);
-                    zeros(1,5) 1];
-                
+                B = [F11 0 0 0 F15 0;
+                     0 F22 0 F24 0 0;
+                     0 0 1 0 0 0;
+                     0 F42 0 F44 0 0;
+                     F51 0 0 0 F55 0;
+                     0 0 0 0 0 1];
+                 
                 obj.csF(counter,:) = ft(counter,:)*B.';
             end
         end
