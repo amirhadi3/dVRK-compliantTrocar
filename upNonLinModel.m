@@ -3,6 +3,7 @@ function y = upNonLinModel(x,Ls,Nn,ft)
 % x(37) = L;
 % x(38) = c;
 % x(39) = Lp;
+% x(40) = offset in Ls
 %
 A = reshape(x(1:36),6,6);
 yy = Nn*A';
@@ -10,6 +11,8 @@ yy = Nn*A';
 L = x(37);
 c = x(38);
 Lp = x(39);
+offset_LS = x(40);
+Ls = offset_LS+Ls;
 
 g = Ls.^2./(c+2*Ls.^3);
 F11 = 1-(3*L-Ls).*g;

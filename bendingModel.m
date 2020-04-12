@@ -29,14 +29,14 @@ clc;clear all;close all;
     x(39)       --> Lp
 %}
 %% Initialize the shaft properties
-E = 100E9;              % modulus of elasticity (N/m2)
-G = 3E9;                % shear modulus of elasticity (N/m2)
+E = 100E9;            % modulus of elasticity (N/m2)
+G = 3E9;              % shear modulus of elasticity (N/m2)
 
-ri = 5.99/2/1000;       % inner radius of the shaft (m)
-ro = 8.36/2/1000;       % outer radius of the shaft (m)
-L = (430)/1000;         % length of the shaft (m)
-Lp = 50e-3;             % Lp is the distance from the base of the instrument
-                        % at which the sensor is mounted in (m)
+ri = 5.99/2/1000;     % inner radius of the shaft (m)
+ro = 8.36/2/1000;     % outer radius of the shaft (m)
+L = (430)/1000;       % length of the shaft (m)
+Lp = 50e-3;           % Lp is the distance from the base of the instrument
+                      % at which the sensor is mounted in (m)
 %% ks is the spring stiffness in the trocar
 ks = 10000;             % ks is the trocar stiffness in N/m
 %% construct a shaft object
@@ -86,15 +86,31 @@ plotsettings('sequence Number','Mz(N.m)')
 c = 6*shaftObj.E*shaftObj.Ixx/shaftObj.ks;
 
 
-lb = [-inf*ones(36,1);0.8*L;0.2*c;Lp];
-ub = [ inf*ones(36,1);1.2*L;  5*c;Lp];
+lb = [-inf*ones(36,1);0.6*L;0.2*c;Lp;-L];
+ub = [ inf*ones(36,1);1.4*L;  10*c;Lp;L];
 
-f = @(x) upNonLinModel(x,Ls,shaftObj.Nn,shaftObj.tpF);
+randomLsOffset = rand(1)*20/1000;
+encoderLs = Ls + randomLsOffset;
 
-options = optimoptions(@lsqnonlin,'MaxIterations',1000,'Algorithm','trust-region-reflective','Display','iter');
-[optimal_x,resnorm] = lsqnonlin(f,rand(39,1),lb,ub,options);
-optimal_x(39)
-inv(reshape(optimal_x(1:36),6,6))
+f = @(x) upNonLinModel(x,encoderLs,shaftObj.Nn,shaftObj.tpF);
+
+options = optimoptions(@lsqnonlin,'MaxIterations',1000,'Algorithm',
+'trust-region-reflective','Display','iter','MaxFunctionEvaluations',inf);
+[optimal_x,resnorm] = lsqnonlin(f,rand(40,1),lb,ub,options);
+
+id_A = inv(reshape(optimal_x(1:36),6,6));
+%% display the results
+disp("----------------------------------------------------------------")
+fprintf("%-20s%-20s%-20s\n",'Variable','True Value','Identified Value');
+fprintf("%-20s%-20f%-20f\n",'L',L,optimal_x(37));
+fprintf("%-20s%-20f%-20f\n",'c',c,optimal_x(38));
+fprintf("%-20s%-20f%-20f\n",'Lp',Lp,optimal_x(39));
+fprintf("%-20s%-20f%-20f\n",'Ls_offset',-randomLsOffset,optimal_x(40));
+disp("----------------------------------------------------------------")
+disp("True A - Sensor calibration Matrix {F = A*Nn}")
+disp(shaftObj.A)
+disp("Identified A - Sensor calibration Matrix {F = A*Nn}")
+disp(id_A)
 %%
 function ati = readForceData()
 ati = table2array(readtable('atiData.txt'));
