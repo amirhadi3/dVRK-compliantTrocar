@@ -22,11 +22,12 @@ clc;clear all;close all;
     calibration is to find the A matrix, L, Lp and ks. 
 
     when A is a 6x6 matrix, the vector of optimization parameters (x) is
-    39x1 in which the first 36 elements are the elements of the A matrix
+    40x1 in which the first 36 elements are the elements of the A matrix
     x(1 ... 36) --> A (6x6)
     x(37)       --> L
     x(38)       --> c
     x(39)       --> Lp
+    x(40)       --> offsetLs
 %}
 %% Initialize the shaft properties
 E = 100E9;            % modulus of elasticity (N/m2)
@@ -85,7 +86,6 @@ plotsettings('sequence Number','Mz(N.m)')
 %% solve the optimization function with specified bounds
 c = 6*shaftObj.E*shaftObj.Ixx/shaftObj.ks;
 
-
 lb = [-inf*ones(36,1);0.6*L;0.2*c;Lp;-L];
 ub = [ inf*ones(36,1);1.4*L;  10*c;Lp;L];
 
@@ -118,7 +118,6 @@ ati = ati-mean(ati(1:500,:));
 ati(:,1:2) = -ati(:,1:2);
 ati(:,3)= -ati(:,3);
 ati(:,6) = ati(:,6);
-% ati = ati(10000:15000,:);
 end
 
 function plotsettings(xlabelstring,ylabelstring)
