@@ -102,7 +102,7 @@ ati = ati-mean(ati(1:500,:));
 ati(:,1:2) = -ati(:,1:2);
 ati(:,3)= -ati(:,3);
 ati(:,6) = ati(:,6);
-ati = ati(10000:15000,:);
+% ati = ati(10000:15000,:);
 end
 
 function plotsettings(xlabelstring,ylabelstring)
