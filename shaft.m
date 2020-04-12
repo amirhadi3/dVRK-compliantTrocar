@@ -1,24 +1,24 @@
 classdef shaft
     properties
-        Ixx
-        Iyy
-        Izz
-        Area
+        Ixx       % area moment of inertia about the x axis (m4)
+        Iyy       % area moment of inertia about the y axis (m4)
+        Izz       % area moment of inertia about the z axis (m4)
     end
     properties
-        L
-        ri
-        ro
-        E
-        ks
-        G
-        tpF
-        csF
-        Ls
-        Lp
-        Nn
+        L         % length of the shaft (m)
+        ri        % inner diameter of the shaft (m)
+        ro        % outer diameter of the shaft (m)
+        E         % modulus of elasticity of the shaft (N/m2)
+        ks        % stiffness at the trocar (N/m)
+        G         % shear modulus of elasticity (N/m2)
+        tpF       % the wrench vector at the tip (6x1 N and N.m)
+        csF       % the wrench vector at Lp cross section (6x1 N and N.m)
+        Ls        % insertion depth into the trocar (m)
+        Lp        % location of the cross section from the instrument base (m)
+        Nn        % the normalized transducer signals
     end
     properties (Constant)
+        % taken from the TRO paper on sensor calibration
         A =[0.0002    0.0142   -0.0001   -0.0002   -0.0000    0.0004;
             0.0063    0.0101   -0.0004   -0.0003    0.0002    0.0000;
             -0.0107   -0.0044    0.0002    0.0001   -0.0002    0.0004;
@@ -27,6 +27,7 @@ classdef shaft
             0.0065   -0.0126   -0.0002    0.0002    0.0002    0.0000]*diag([1,1,1,1000,1000,1000]);
     end
     methods
+        % constructor
         function obj = shaft(length,innerRadi,outerRadi,modElasticity,...
                 shModElasticity,trocarStiffness)
             obj.L = length;
