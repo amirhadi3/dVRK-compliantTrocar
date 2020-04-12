@@ -24,7 +24,7 @@ classdef shaft
             -0.0107   -0.0044    0.0002    0.0001   -0.0002    0.0004;
             -0.0129    0.0021   -0.0000    0.0000   -0.0003   -0.0000;
             0.0096   -0.0076   -0.0001    0.0001    0.0002    0.0004;
-            0.0065   -0.0126   -0.0002    0.0002    0.0002    0.0000];
+            0.0065   -0.0126   -0.0002    0.0002    0.0002    0.0000]*diag([1,1,1,1000,1000,1000]);
     end
     methods
         function obj = shaft(length,innerRadi,outerRadi,modElasticity,...
@@ -41,7 +41,7 @@ classdef shaft
             obj.Izz = 1/2*pi*(obj.ro^4-obj.ri^4);
             obj.Area = pi*(obj.ro^2-obj.ri^2);
         end
-        function obj = ft_to_F(obj,ft,colLs,Lp)
+        function obj = ft_to_csF(obj,ft,colLs,Lp)
             % n is the number of measrement points
             % "ft" is an nx6 matrix of forces at the tip at every measurement
             % point
