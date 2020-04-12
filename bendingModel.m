@@ -84,10 +84,11 @@ subplot(3,2,6);
 plot(ft(:,6),'b','linewidth',2)
 plotsettings('sequence Number','Mz(N.m)')
 %% solve the optimization function with specified bounds
-c = 6*shaftObj.E*shaftObj.Ixx/shaftObj.ks;
+cx = 6*shaftObj.E*shaftObj.Ixx/shaftObj.ks;
+cy = 6*shaftObj.E*shaftObj.Iyy/shaftObj.ks;
 
-lb = [-inf*ones(36,1);0.6*L;0.2*c;Lp;-L];
-ub = [ inf*ones(36,1);1.4*L;  10*c;Lp;L];
+lb = [-inf*ones(36,1);0.6*L;0.2*cx;0.2*cy;Lp;-L];
+ub = [ inf*ones(36,1);1.4*L; 10*cx; 10*cy;Lp;L];
 
 randomLsOffset = rand(1)*20/1000;
 encoderLs = Ls + randomLsOffset;
@@ -96,16 +97,17 @@ f = @(x) upNonLinModel(x,encoderLs,shaftObj.Nn,shaftObj.tpF);
 
 options = optimoptions(@lsqnonlin,'MaxIterations',1000,'Algorithm',...
 'trust-region-reflective','Display','iter','MaxFunctionEvaluations',inf);
-[optimal_x,resnorm] = lsqnonlin(f,rand(40,1),lb,ub,options);
+[optimal_x,resnorm] = lsqnonlin(f,rand(41,1),lb,ub,options);
 
 id_A = inv(reshape(optimal_x(1:36),6,6));
 %% display the results
 disp("----------------------------------------------------------------")
 fprintf("%-20s%-20s%-20s\n",'Variable','True Value','Identified Value');
 fprintf("%-20s%-20f%-20f\n",'L',L,optimal_x(37));
-fprintf("%-20s%-20f%-20f\n",'c',c,optimal_x(38));
-fprintf("%-20s%-20f%-20f\n",'Lp',Lp,optimal_x(39));
-fprintf("%-20s%-20f%-20f\n",'Ls_offset',-randomLsOffset,optimal_x(40));
+fprintf("%-20s%-20f%-20f\n",'cx',cx,optimal_x(38));
+fprintf("%-20s%-20f%-20f\n",'cy',cy,optimal_x(39));
+fprintf("%-20s%-20f%-20f\n",'Lp',Lp,optimal_x(40));
+fprintf("%-20s%-20f%-20f\n",'Ls_offset',-randomLsOffset,optimal_x(41));
 disp("----------------------------------------------------------------")
 disp("True A - Sensor calibration Matrix {F = A*Nn}")
 disp(shaftObj.A)
