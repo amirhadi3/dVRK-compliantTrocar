@@ -94,7 +94,7 @@ encoderLs = Ls + randomLsOffset;
 
 f = @(x) upNonLinModel(x,encoderLs,shaftObj.Nn,shaftObj.tpF);
 
-options = optimoptions(@lsqnonlin,'MaxIterations',1000,'Algorithm',
+options = optimoptions(@lsqnonlin,'MaxIterations',1000,'Algorithm',...
 'trust-region-reflective','Display','iter','MaxFunctionEvaluations',inf);
 [optimal_x,resnorm] = lsqnonlin(f,rand(40,1),lb,ub,options);
 
