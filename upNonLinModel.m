@@ -22,8 +22,8 @@ F11 = 1-(3*L-Ls).*gy;
 F15 = -3*gy;
 F22 = 1 - (3*L-Ls).*gx;
 F24 = 3*gx;
-F42 = (3*L-Ls).*(Ls-Lp).*gy-(L-Lp);
-F44 = 1-3*(Ls-Lp).*gy;
+F42 = (3*L-Ls).*(Ls-Lp).*gx-(L-Lp);
+F44 = 1-3*(Ls-Lp).*gx;
 F51 = (L-Lp)-(3*L-Ls).*(Ls-Lp).*gy;
 F55 = 1-3*(Ls-Lp).*gy;
 

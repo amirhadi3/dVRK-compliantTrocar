@@ -25,9 +25,10 @@ clc;clear all;close all;
     40x1 in which the first 36 elements are the elements of the A matrix
     x(1 ... 36) --> A (6x6)
     x(37)       --> L
-    x(38)       --> c
-    x(39)       --> Lp
-    x(40)       --> offsetLs
+    x(38)       --> cx
+    x(39)       --> cy
+    x(40)       --> Lp
+    x(41)       --> offsetLs
 %}
 %% Initialize the shaft properties
 E = 100E9;            % modulus of elasticity (N/m2)
@@ -83,12 +84,18 @@ plotsettings('sequence Number','Fz(N)')
 subplot(3,2,6);
 plot(ft(:,6),'b','linewidth',2)
 plotsettings('sequence Number','Mz(N.m)')
+
+figure(2)
+plot(shaftObj.Nn,'linewidth',2);
+set(gcf, 'WindowState', 'maximized');
+plotsettings('sequence Number','N_{ni} (dmls)')
+legend('i=1','i=2','i=3','i=4','i=5','i=6')
 %% solve the optimization function with specified bounds
 cx = 6*shaftObj.E*shaftObj.Ixx/shaftObj.ks;
 cy = 6*shaftObj.E*shaftObj.Iyy/shaftObj.ks;
 
-lb = [-inf*ones(36,1);0.6*L;0.2*cx;0.2*cy;Lp;-L];
-ub = [ inf*ones(36,1);1.4*L; 10*cx; 10*cy;Lp;L];
+lb = [-inf*ones(36,1);0.6*L;0.2*cx;0.2*cy;1.5*Lp;-L];
+ub = [ inf*ones(36,1);1.4*L; 10*cx; 10*cy;1.5*Lp;L];
 
 randomLsOffset = rand(1)*20/1000;
 encoderLs = Ls + randomLsOffset;

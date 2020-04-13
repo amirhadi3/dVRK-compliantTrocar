@@ -61,8 +61,8 @@ classdef shaft
             F15 = -3*gy;
             F22 = 1 - (3*obj.L-obj.Ls).*gx;
             F24 = 3*gx;
-            F42 = (3*obj.L-obj.Ls).*(obj.Ls-obj.Lp).*gy-(obj.L-obj.Lp);
-            F44 = 1-3*(obj.Ls-obj.Lp).*gy;
+            F42 = (3*obj.L-obj.Ls).*(obj.Ls-obj.Lp).*gx-(obj.L-obj.Lp);
+            F44 = 1-3*(obj.Ls-obj.Lp).*gx;
             F51 = (obj.L-obj.Lp)-(3*obj.L-obj.Ls).*(obj.Ls-obj.Lp).*gy;
             F55 = 1-3*(obj.Ls-obj.Lp).*gy;
             
