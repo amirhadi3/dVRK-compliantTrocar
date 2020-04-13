@@ -30,6 +30,11 @@ clc;clear all;close all;
     x(40)       --> Lp
     x(41)       --> offsetLs
 %}
+%%
+warning('off','all');
+rmpath(genpath('C:\Users\ahhadi\Documents\GitHub'));
+warning('on','all');
+addpath(sprintf('%s%s',pwd,'\atiData'));
 %% Initialize the shaft properties
 E = 100E9;            % modulus of elasticity (N/m2)
 G = 3E9;              % shear modulus of elasticity (N/m2)
