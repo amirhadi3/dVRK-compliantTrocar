@@ -99,8 +99,8 @@ legend('i=1','i=2','i=3','i=4','i=5','i=6')
 cx = 6*shaftObj.E*shaftObj.Ixx/shaftObj.ks;
 cy = 6*shaftObj.E*shaftObj.Iyy/shaftObj.ks;
 
-lb = [-inf*ones(36,1);0.6*L;0.2*cx;0.2*cy;1.5*Lp;-L];
-ub = [ inf*ones(36,1);1.4*L; 10*cx; 10*cy;1.5*Lp;L];
+lb = [-inf*ones(36,1);0.6*L;0.2*cx;0.2*cy;Lp;-L];
+ub = [ inf*ones(36,1);1.4*L; 10*cx; 10*cy;Lp;L];
 
 randomLsOffset = rand(1)*20/1000;
 encoderLs = Ls + randomLsOffset;
@@ -109,7 +109,7 @@ f = @(x) upNonLinModel(x,encoderLs,shaftObj.Nn,shaftObj.tpF);
 
 options = optimoptions(@lsqnonlin,'MaxIterations',1000,'Algorithm',...
 'trust-region-reflective','Display','iter','MaxFunctionEvaluations',inf);
-[optimal_x,resnorm] = lsqnonlin(f,rand(41,1),lb,ub,options);
+[optimal_x,resnorm] = lsqnonlin(f,rand(41,1)*1002,lb,ub,options);
 
 id_A = inv(reshape(optimal_x(1:36),6,6));
 %% display the results
