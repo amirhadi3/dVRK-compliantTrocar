@@ -22,7 +22,7 @@ duration =50                        # duration (sec)
 # ---- Motion cycles and duration: end ----
 
 # ---- construct a sinusoidal position command: start ----
-Ts = 0.01 #s
+Ts = 0.001 #s
 ls_min = 0.08
 ls_max = 0.19
 
@@ -32,9 +32,9 @@ q1 = [ls_max]
 v0 = [0]
 v1 = [0]
 
-v_max = 0.020
-a_max = 0.015
-j_max = 0.0100
+v_max = 0.005
+a_max = 0.5
+j_max = 1.00
 
 q = ScurvePlanner()
 tr = q.plan_trajectory(q0, q1, v0, v1, v_max, a_max, j_max)
@@ -58,10 +58,6 @@ q0 = [ls_cmd[-1]]
 q1 = [ls_min]
 v0 = [0]
 v1 = [0]
-
-v_max = 0.050
-a_max = 1.5
-j_max = 1.00
 
 q = ScurvePlanner()
 tr = q.plan_trajectory(q0, q1, v0, v1, v_max, a_max, j_max)
@@ -88,7 +84,7 @@ if plot:
     plt.grid(True)
     plt.show()
 # ---- construct a sinusoidal position command: end ----
-
+time.sleep(3)
 for item in np.nditer(ls_cmd):
     p.move_joint_one(float(item),2,interpolate = False, blocking = False)
     time.sleep(Ts)
