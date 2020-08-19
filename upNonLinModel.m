@@ -1,18 +1,23 @@
-function y = upNonLinModel(x,Ls,Nn,ft)
-% x(1:36) = A(6x6)
-% x(37) = L;
-% x(38) = c;
-% x(39) = Lp;
-% x(40) = offset in Ls
-%
-A = reshape(x(1:36),6,6);
-yy = Nn*A';
+function y = upNonLinModel(x,Ls,Nn,ft,m)
 
-L = x(37);
-cx = x(38);
-cy = x(39);
-Lp = x(40);
-offset_LS = x(41);
+% x(1:6*m) = A(6*m)
+% x(6*m+1) = L;
+% x(6*m+2) = cx;
+% x(6*m+3) = cy;
+% x(6*m+4) = Lp;
+% x(6*m+5) = offset in Ls
+% DOFs = an vector of 6x1 which indicates which DOFs to include in the
+% calibration example (DOFS = [1,2,6])
+
+A = reshape(x(1:6*m),6,m);
+csf = Nn*A'; %%dim(yy) = n*m*m*6 = n*6
+
+L = x(6*m+1);
+cx = x(6*m+2);
+cy = x(6*m+3);
+Lp = x(6*m+4);
+offset_LS = x(6*m+5);
+
 Ls = offset_LS+Ls;
 
 gx = Ls.^2./(cx+2*Ls.^3);
@@ -57,4 +62,4 @@ for counter = 1:size(ft,1)
     F(counter,:) = ft(counter,:)*B.';
 end
 %}
-y = yy-F;
+y = csf-F;

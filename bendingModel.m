@@ -111,7 +111,7 @@ options = optimoptions(@lsqnonlin,'MaxIterations',1000,'Algorithm',...
 'trust-region-reflective','Display','iter','MaxFunctionEvaluations',inf);
 [optimal_x,resnorm] = lsqnonlin(f,rand(41,1)*1002,lb,ub,options);
 
-id_A = inv(reshape(optimal_x(1:36),6,6));
+id_A = reshape(optimal_x(1:36),6,6);
 %% display the results
 disp("----------------------------------------------------------------")
 fprintf("%-20s%-20s%-20s\n",'Variable','True Value','Identified Value');
@@ -119,7 +119,6 @@ fprintf("%-20s%-20f%-20f\n",'L',L,optimal_x(37));
 fprintf("%-20s%-20f%-20f\n",'cx',cx,optimal_x(38));
 fprintf("%-20s%-20f%-20f\n",'cy',cy,optimal_x(39));
 fprintf("%-20s%-20f%-20f\n",'Lp',Lp,optimal_x(40));
-fprintf("%-20s%-20f%-20f\n",'Ls_offset',-randomLsOffset,optimal_x(41));
 disp("----------------------------------------------------------------")
 disp("True A - Sensor calibration Matrix {F = A*Nn}")
 disp(shaftObj.A)
@@ -129,9 +128,10 @@ disp(id_A)
 function ati = readForceData()
 ati = table2array(readtable('atiData.txt'));
 ati = ati-mean(ati(1:500,:));
-ati(:,1:2) = -ati(:,1:2);
-ati(:,3)= -ati(:,3);
-ati(:,6) = ati(:,6);
+ati(:,1) = -ati(:,1);
+ati(:,3) = -ati(:,3);
+ati(:,6) = -ati(:,6);
+ati(:,4) = -ati(:,4);
 end
 
 function plotsettings(xlabelstring,ylabelstring)
