@@ -4,9 +4,9 @@ warning('off','all');
 rmpath(genpath(sprintf('%s%s',pwd)));
 warning('on','all');
 addpath(sprintf('%s%s',pwd,'\20200818-5'));
-print_on = false;
+print_on = true;
 do_train = true;
-plot_suffix = '_new';
+plot_suffix = '_15';
 %% read data
 ati = readForceData();
 diffsig = table2array(readtable('diffData'));
@@ -35,7 +35,7 @@ ati_train = (ati./max_ati)';
 %%
 if do_train
     % Create a Fitting Network
-    hiddenLayerSize = [10 10];
+    hiddenLayerSize = [15];
     net = fitnet(hiddenLayerSize);
     
     % Set up Division of Data for Training, Validation, Testing
@@ -53,7 +53,7 @@ if do_train
     % View the Network
     view(net)
 else
-    load('network.mat')
+    load('network_10_10.mat')
     % Test the Network
     y = net(x);
     tic
