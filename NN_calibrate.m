@@ -3,7 +3,7 @@ clc;clear all;close all
 warning('off','all');
 rmpath(genpath(sprintf('%s%s',pwd)));
 warning('on','all');
-addpath(sprintf('%s%s',pwd,'/20200818-5'));
+addpath(sprintf('%s%s',pwd,'\20200818-5'));
 print_on = false;
 do_train = true;
 plot_suffix = '_new';
@@ -43,9 +43,10 @@ if do_train
     net.divideParam.trainRatio = 70/100;
     net.divideParam.valRatio = 15/100;
     net.divideParam.testRatio = 15/100;
+    net.trainParam.epochs=1000;
     
     % Train the Network
-    [net,tr] = train(net,x,ati_train,'useGPU','yes');%'useParallel','yes','showResources','yes');
+    [net,tr] = train(net,x,ati_train);%,'useGPU','yes','useParallel','yes','showResources','yes');
     
     % Test the Network
     y = net(x);

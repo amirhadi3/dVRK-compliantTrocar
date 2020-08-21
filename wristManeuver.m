@@ -25,11 +25,11 @@ atiLables = {'F_{Nx}','F_{Ny}','F_{Nz}','M_{Nx}','M_{Ny}','M_{Nz}'};
 ofsLabels = {'V_{N1}','V_{N2}','V_{N3}','V_{N4}','V_{N5}','V_{N6}'};
 %% Training Data and Test Data
 x = [0.08*ones(size(diffsig,1),1),Nsig];
-load(sprintf('mean_normalization%s.mat',network_suffix));
+load(sprintf('network%s.mat',network_suffix),'net','tr','mean_x','stddev_x','ati_max');
 x = (x-mean_x)./stddev_x;
 x = x';
 %% Find calibration results
-load(sprintf('network%s.mat',network_suffix));
+
 y = net(x);
 pred = y'.*max_ati;
 %%
