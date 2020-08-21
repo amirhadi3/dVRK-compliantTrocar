@@ -6,7 +6,7 @@ warning('on','all');
 addpath(sprintf('%s%s',pwd,'\20200818-5'));
 print_on = true;
 do_train = true;
-plot_suffix = '_15';
+plot_suffix = '_new';
 %% read data
 ati = readForceData();
 diffsig = table2array(readtable('diffData'));
@@ -35,7 +35,7 @@ ati_train = (ati./max_ati)';
 %%
 if do_train
     % Create a Fitting Network
-    hiddenLayerSize = [15];
+    hiddenLayerSize = [10 10];
     net = fitnet(hiddenLayerSize);
     
     % Set up Division of Data for Training, Validation, Testing
