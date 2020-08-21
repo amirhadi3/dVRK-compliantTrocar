@@ -4,9 +4,9 @@ warning('off','all');
 rmpath(genpath(sprintf('%s%s',pwd)));
 warning('on','all');
 addpath(sprintf('%s%s',pwd,'\20200818-5'));
-print_on = true;
-do_train = true;
-plot_suffix = '_15';
+print_on = false;
+do_train = false;
+plot_suffix = '_10_10';
 %% read data
 ati = readForceData();
 diffsig = table2array(readtable('diffData'));
@@ -23,19 +23,20 @@ Ts = 1/Fs;
 t = (1:numPoint)*Ts;
 atiLables = {'F_{Nx}','F_{Ny}','F_{Nz}','M_{Nx}','M_{Ny}','M_{Nz}'};
 ofsLabels = {'V_{N1}','V_{N2}','V_{N3}','V_{N4}','V_{N5}','V_{N6}'};
+%% scale correction
+max_ati = max(ati);
+ati_train = (ati./max_ati)';
 %% Training Data and Test Data
 x = [possig,Nsig];
 mean_x = mean(x);
 stddev_x = std(x);
 x = (x-mean_x)./stddev_x;
 x = x';
-%% scale correction
-max_ati = max(ati);
-ati_train = (ati./max_ati)';
+save(sprintf('mean_normalization%s.mat',plot_suffix),'mean_x','stddev_x','max_ati');
 %%
 if do_train
     % Create a Fitting Network
-    hiddenLayerSize = [15];
+    hiddenLayerSize = [10 10];
     net = fitnet(hiddenLayerSize);
     
     % Set up Division of Data for Training, Validation, Testing
