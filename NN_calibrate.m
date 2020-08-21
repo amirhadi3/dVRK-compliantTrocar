@@ -3,8 +3,8 @@ clc;clear all;close all
 warning('off','all');
 rmpath(genpath(sprintf('%s%s',pwd)));
 warning('on','all');
-addpath(sprintf('%s%s',pwd,'\20200818-5'));
-print_on = true;
+addpath(sprintf('%s%s',pwd,'/20200818-5'));
+print_on = false;
 do_train = true;
 plot_suffix = '_new';
 %% read data
@@ -16,6 +16,8 @@ possig = table2array(readtable('posData'));
 diffsig = diffsig - mean(diffsig(1:500,:));
 Nsig = diffsig./sumsig;
 Nsig = [Nsig,Nsig.^2];
+possig = [possig(1);possig];
+x = [possig,Nsig];
 %% data sampling parameters
 numPoint = size(ati,1);
 Fs = 1500;
@@ -23,18 +25,16 @@ Ts = 1/Fs;
 t = (1:numPoint)*Ts;
 atiLables = {'F_{Nx}','F_{Ny}','F_{Nz}','M_{Nx}','M_{Ny}','M_{Nz}'};
 ofsLabels = {'V_{N1}','V_{N2}','V_{N3}','V_{N4}','V_{N5}','V_{N6}'};
-%% scale correction
-max_ati = max(ati);
-ati_train = (ati./max_ati)';
-%% Training Data and Test Data
-x = [possig,Nsig];
-mean_x = mean(x);
-stddev_x = std(x);
-x = (x-mean_x)./stddev_x;
-x = x';
-save(sprintf('mean_normalization%s.mat',plot_suffix),'mean_x','stddev_x','max_ati');
 %%
 if do_train
+    %Training Data and Test Data
+    mean_x = mean(x);
+    stddev_x = std(x);
+    x = (x-mean_x)./stddev_x;
+    x = x';
+    max_ati = max(ati);
+    ati_train = (ati./max_ati)';
+    
     % Create a Fitting Network
     hiddenLayerSize = [10 10];
     net = fitnet(hiddenLayerSize);
@@ -45,16 +45,18 @@ if do_train
     net.divideParam.testRatio = 15/100;
     
     % Train the Network
-    [net,tr] = train(net,x,ati_train);
+    [net,tr] = train(net,x,ati_train,'useGPU','yes');%'useParallel','yes','showResources','yes');
     
     % Test the Network
     y = net(x);
     pred = y'.*max_ati;
-    save(sprintf('network%s.mat',plot_suffix),'net','tr')
+    save(sprintf('network%s.mat',plot_suffix),'net','tr','mean_x','stddev_x','max_ati')
     % View the Network
     view(net)
 else
-    load('network_10_10.mat')
+    load('network_new.mat','net','tr','mean_x','stddev_x','max_ati')
+    x = (x-mean_x)./stddev_x;
+    x = x';
     % Test the Network
     y = net(x);
     tic
