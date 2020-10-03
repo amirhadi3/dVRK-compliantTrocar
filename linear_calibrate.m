@@ -28,7 +28,7 @@ G = 3E9;              % shear modulus of elasticity (N/m2)
 
 ri = 5.99/2/1000;     % inner radius of the shaft (m)
 ro = 8.36/2/1000;     % outer radius of the shaft (m)
-L = (360)/1000;       % length of the shaft (m)
+L = (400)/1000;       % length of the shaft (m)
 Lp = 60e-3;           % Lp is the distance from the base of the instrument
                       % at which the sensor is mounted in (m)
 
@@ -41,9 +41,15 @@ ks = 10000;             % ks is the trocar stiffness in N/m
 cx = 6*E*Ixx/ks;
 m = size(Nsig,2);
 
+Ls_min = 0;
+Ls_max = L;
+
+Ls_offset_min = max(possig);
+Ls_offset_max = L;
+
 if fit_active
-lb = [-inf*ones(6*m,1);0.8*L;0.2*cx;0.2*cx;Lp;-L];
-ub = [ inf*ones(6*m,1);1.2*L; 10*cx;10*cx;Lp;L];
+lb = [-inf*ones(6*m,1);0.5*L;0.2*cx;0.2*cx;Lp;Ls_offset_min];
+ub = [ inf*ones(6*m,1);1.5*L; 10*cx;10*cx;Lp;Ls_offset_max];
 
 f = @(x) upNonLinModel(x,possig,Nsig,ati,m);
 
@@ -69,7 +75,7 @@ disp(id_A)
 %%
 csf = Nsig*id_A';                                   % forces at the cross-section
 
-Ls = optimal_x(6*m+5)+possig;
+Ls = optimal_x(6*m+5)-possig;
 ft = ati;
 cx = optimal_x(6*m+2);
 cy = optimal_x(6*m+3);

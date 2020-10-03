@@ -18,7 +18,7 @@ cy = x(6*m+3);
 Lp = x(6*m+4);
 offset_LS = x(6*m+5);
 
-Ls = offset_LS+Ls;
+Ls = offset_LS-Ls;
 
 gx = Ls.^2./(cx+2*Ls.^3);
 gy = Ls.^2./(cy+2*Ls.^3);
