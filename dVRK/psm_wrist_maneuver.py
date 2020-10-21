@@ -17,11 +17,12 @@ for item in start_pos:
     p.move_joint_one(float(item),axis,interpolate = True, blocking = True)
     axis+=1
 
-p.move_jaw(0,interpolate = False, blocking = False)
+p.move_jaw(0,interpolate = True, blocking = True)
 cycleNum = 1
+time.sleep(3)
 
-axisIndex = [3,4,5];
-motion_rng = [[-math.pi/2,math.pi/2,0],[-math.pi/3,math.pi/3,0],[-math.pi/3,math.pi/3,0]]
+axisIndex = [4,5];
+motion_rng = [[-math.pi/3,math.pi/3,0],[-math.pi/3,math.pi/3,0]]
 
 v_max = 0.5
 a_max = 5

@@ -15,3 +15,5 @@ axis = 0
 for item in start_pos:
     p.move_joint_one(float(item),axis,interpolate = True, blocking = True)
     axis+=1
+
+p.close_jaw()
