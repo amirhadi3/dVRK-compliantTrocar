@@ -5,8 +5,8 @@ rmpath(genpath(sprintf('%s%s',pwd)));
 warning('on','all');
 addpath(sprintf('%s%s',pwd,'\20200818-5'));
 print_on = false;
-do_train = true;
-plot_suffix = '_new';
+do_train = false;
+plot_suffix = '_10_10';
 %% read data
 ati = readForceData();
 diffsig = table2array(readtable('diffData'));
@@ -16,7 +16,6 @@ possig = table2array(readtable('posData'));
 diffsig = diffsig - mean(diffsig(1:500,:));
 Nsig = diffsig./sumsig;
 Nsig = [Nsig,Nsig.^2];
-possig = [possig(1);possig];
 x = [possig,Nsig];
 %% data sampling parameters
 numPoint = size(ati,1);
@@ -55,7 +54,8 @@ if do_train
     % View the Network
     view(net)
 else
-    load('network_new.mat','net','tr','mean_x','stddev_x','max_ati')
+    load('network_10_10.mat','net','tr','mean_x','stddev_x','max_ati')
+    net = network(net);
     x = (x-mean_x)./stddev_x;
     x = x';
     % Test the Network
