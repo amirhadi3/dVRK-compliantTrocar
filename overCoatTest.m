@@ -69,7 +69,7 @@ for axisNum=1:6
                         subplot(3,2,5);
             plot(t,ati(:,3),'b','linewidth',2);
             hold on;
-            plot(t,pred(:,3),'r','linewidth',2);
+            plot(t,pred(:,3)/5,'r','linewidth',2);
             ylabel('F_z (N)','fontweight','b');
         case 4
                         subplot(3,2,2);
@@ -111,13 +111,13 @@ set(gcf,'color','w')
 set(gcf, 'InvertHardCopy', 'off');
 
 ha=get(gcf,'children');
-set(ha(1),'position',[0.6105 0.16 0.2945 0.2157])
-set(ha(2),'position',[0.6105 0.40 0.2945 0.2157])
-set(ha(3),'position',[0.6105 0.64 0.2945 0.2157])
-set(ha(4),'position',[0.1300 0.16 0.3347 0.2157])
-set(ha(5),'position',[0.1300 0.40 0.3347 0.2157])
-set(ha(6),'position',[0.1300 0.88 0.6105+0.2945-0.13 0.0359])
-set(ha(7),'position',[0.1300 0.64 0.3347 0.2157])
+set(ha(1),'position',[0.6105 0.15 0.2945 0.17])
+set(ha(2),'position',[0.6105 0.35 0.2945 0.17])
+set(ha(3),'position',[0.6105 0.55 0.2945 0.17])
+set(ha(4),'position',[0.1300 0.15 0.3347 0.17])
+set(ha(5),'position',[0.1300 0.35 0.3347 0.17])
+set(ha(6),'position',[0.1300 0.73 0.6105+0.2945-0.13 0.0359])
+set(ha(7),'position',[0.1300 0.55 0.3347 0.17])
 if print_on
-    print(sprintf('calibrationPlot%s',plot_suffix),'-djpeg','-r600');
+    print('overcoat','-djpeg','-r600');
 end

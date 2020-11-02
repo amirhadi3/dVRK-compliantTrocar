@@ -4,8 +4,8 @@ warning('off','all');
 rmpath(genpath(sprintf('%s%s',pwd)));
 warning('on','all');
 addpath(sprintf('%s%s',pwd,'\20200818-5'));
-fit_active = false;
-print_on = true;
+fit_active = true;
+print_on = false;
 plot_suffix = '_linear';
 %% read data
 ati = readForceData();

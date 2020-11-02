@@ -1,4 +1,4 @@
-function y = upNonLinModel(x,Ls,Nn,ft,m)
+function y = upNonLinModel2(x,Ls,Nn,ft,m,maxati)
 
 % x(1:6*m) = A(6*m)
 % x(6*m+1) = L;
