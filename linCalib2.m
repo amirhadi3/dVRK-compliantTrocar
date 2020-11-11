@@ -3,7 +3,7 @@ clc;clear all;close all
 warning('off','all');
 rmpath(genpath(sprintf('%s%s',pwd)));
 warning('on','all');
-addpath(sprintf('%s%s',pwd,'\20201021-1'));
+addpath(sprintf('%s%s',pwd,'/20201102-6'));
 fit_active = true;
 print_on = false;
 plot_suffix = '_linear';
@@ -16,11 +16,10 @@ atiN = ati./maxati;
 diffsig = table2array(readtable('diffData'));
 sumsig = table2array(readtable('sumData'));
 possig = table2array(readtable('posData'));
-
-% diffsig = diffsig(1:40*1500,:);
-% sumsig = sumsig(1:40*1500,:);
+possig = [possig;possig(end,:)];
 % possig = possig(1:40*1500,:);
-
+% sumsig = sumsig(1:40*1500,:);
+% diffsig = diffsig(1:40*1500,:);
 %% data sampling parameters
 numPoint = size(ati,1);
 Fs = 1500;

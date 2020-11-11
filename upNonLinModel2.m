@@ -56,4 +56,4 @@ F(:,6) = csf(:,6)/maxati(6);
 %     
 %     F(i,:) = (pinv(H)*csf(i,:)')'*mat;
 % end
-y = (F-ft);
+y = (F-ft)*diag([1,1,3,10,10,1]);

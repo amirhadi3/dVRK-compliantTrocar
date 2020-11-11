@@ -1,5 +1,3 @@
-from pyscurve import ScurvePlanner, plot_trajectory
-import rospy
 import dvrk
 import math
 import numpy as np

@@ -85,6 +85,8 @@ if plot:
     plt.show()
 # ---- construct a sinusoidal position command: end ----
 time.sleep(3)
-for item in np.nditer(ls_cmd):
-    p.move_joint_one(float(item),2,interpolate = False, blocking = False)
-    time.sleep(Ts)
+for count in range(1):
+    for item in np.nditer(ls_cmd):
+        p.move_joint_one(float(item),2,interpolate = False, blocking = False)
+        time.sleep(Ts)
+    time.sleep(1.5)
