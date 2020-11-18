@@ -3,7 +3,7 @@ clc;clear all;close all
 warning('off','all');
 rmpath(genpath(sprintf('%s%s',pwd)));
 warning('on','all');
-addpath(sprintf('%s%s',pwd,'\20200818-5'));
+addpath(sprintf('%s%s',pwd,'/20200818-5'));
 print_on = false;
 do_train = false;
 plot_suffix = '_10_10';
@@ -12,6 +12,7 @@ ati = readForceData();
 diffsig = table2array(readtable('diffData'));
 sumsig = table2array(readtable('sumData'));
 possig = table2array(readtable('posData'));
+possig = [possig;possig(end,:)];
 %% bias correction
 diffsig = diffsig - mean(diffsig(1:500,:));
 Nsig = diffsig./sumsig;

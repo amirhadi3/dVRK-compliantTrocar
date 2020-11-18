@@ -6,19 +6,24 @@ import math
 import random
 import numpy as np
 import time
-from std_msgs.msg import Float64
+from std_msgs.msg import Float64,String
 import PyKDL
 
 class psm_random_move(object):
 
     def __init__(self,psm_name, totaltime_s,num_wayPoints,joints,joint_limits, Ts):
         # create the psm
+	self.statSubscriber = rospy.Subscriber(psm_name+'/recState',String,self.__subCallback)
+        self.recState = ''
         self.arm = dvrk.psm(psm_name)       
         self.time = totaltime_s
         self.num_wayPoints = num_wayPoints
         self.joints = joints
         self.joint_limits = joint_limits
 	self.Ts = Ts
+
+    def __subCallback(self,msg):
+	self.recState = msg.data
 
     def home(self):
         self.arm.home()
@@ -30,7 +35,20 @@ class psm_random_move(object):
         for item in self.home_pos:
             self.arm.move_joint_one(float(item),axis,interpolate = True, blocking = True)
             axis+=1
-	self.arm.move_jaw(math.pi*7/180,interpolate = True, blocking = True)
+	jawPos = self.arm.get_desired_jaw_position()
+	self.arm.move_jaw(jawPos,interpolate = True, blocking = True)
+
+    def localhome(self):
+        # move the arm to a home position
+        # The units are SI (rad for joints 0,1,3,4,5 and m for joint 2)
+        # move all the axes to the start position defined below
+	ins = self.arm.get_current_joint_position()[2]
+        self.home_pos = [3.4/180*math.pi,1.1/180*math.pi,ins,0,0,0]
+        axis = 0
+        for item in self.home_pos:
+            self.arm.move_joint_one(float(item),axis,interpolate = True, blocking = True)
+            axis+=1
+	self.arm.move_jaw(math.pi*3/180,interpolate = True, blocking = True)
     
     def __piecewiseSineInterpolate(self,x0,xe,dur,Ts):
         a = (xe+x0)/2
@@ -41,10 +59,9 @@ class psm_random_move(object):
         return x
 
     def __genWayPoints(self,x0,xe,numWayPoints,limits):
-	limits[0] = 0.85*limits[0]
-	limits[1] = 0.85*limits[1]
-
-        p = limits[0]+np.random.rand(numWayPoints+4)*(limits[1]-limits[0])
+        locmin = 0.85*limits[0]
+	locmax = 0.85*limits[1]
+        p = locmin+(np.random.rand(numWayPoints+4))*(locmax-locmin)
         p[0] = x0
 	p[1] = limits[0]
 	sgn = np.ones(np.shape(p))
@@ -53,7 +70,7 @@ class psm_random_move(object):
 	p = np.abs(p)*sgn
 	p = np.append(p,limits[1])
 	p = np.append(p,xe)
-	p = np.clip(p,limits[0],limits[1])
+	#p = np.clip(p,limits[0],limits[1])
 	return p
 
     def __findTimeIntervals(self,p,t):
@@ -67,7 +84,7 @@ class psm_random_move(object):
 	while(np.cumsum(timeVec)[-1]>num):
 	    intervalIndex = np.random.randint(0,len(timeVec))
 	    timeVec[intervalIndex]-=1
-	print(np.cumsum(timeVec)[-1])
+	#print(np.cumsum(timeVec)[-1])
 	return timeVec*self.Ts
 
     def __singleAxisInterp(self,wayPoints,dur):
@@ -90,10 +107,19 @@ class psm_random_move(object):
 	counter = 0
 	for joint in self.joints:
  	    joint_traj = self.singleAxisTrajGen(0,0,self.num_wayPoints,self.joint_limits[counter])
+	    numEl = len(joint_traj)
 	    if counter == 0:
 		traj = np.zeros((len(joint_traj),len(self.joints)))
+		numRow = np.shape(traj)[0]
             
-            traj[:,counter] = joint_traj
+	    if numEl > numRow:
+		traj[:,counter] = joint_traj[range(numRow)]
+	    elif numEl < numRow:
+            	traj[range(numEl),counter] = joint_traj
+		padList = -(np.arange(numRow-numEl)+1)		
+		traj[padList,counter]=joint_traj[-1]
+	    else:
+		traj[:,counter] = joint_traj
 	    #plt.plot(traj[:,joint])
 	    #plt.show()
 	    counter+=1
@@ -107,16 +133,10 @@ if __name__ == "__main__":
 
 	#axisIndex = np.array([2,3,4,5],dtype=np.int64);
 	#motion_rng = [[-0.03,0.03],[-math.pi/3,math.pi/3],[-math.pi/4,math.pi/4],[-math.pi/4,math.pi/4]]
-	axisIndex = [0,1,2,5]
-	motion_rng = [[-0.04,0.04],[-0.04,0.04],[-0.04,0.04],[-math.pi/4,math.pi/4]]
-	p = psm_random_move(armname,30,4,axisIndex,motion_rng,0.001)
+	axisIndex = [0,1,2,3,4,5]
+	motion_rng = [[-0.02,0.02],[-0.02,0.02],[-0.02,0.02],[-math.pi/5,math.pi/5],[-math.pi/5,math.pi/5],[-math.pi/5,math.pi/5]]
+	p = psm_random_move(armname,45,6,axisIndex,motion_rng,0.001)
 	p.home()
-
-	traj = p.traj_generate()
-	traj = np.diff(traj,axis=0)
-	# generate jaw motion
-	jp = p.arm.get_desired_jaw_position()
-	jgrip = p.singleAxisTrajGen(0,0,p.num_wayPoints,[-math.pi*2/180,math.pi*2/180]) + jp
 
 	if False:
 	    plt.plot(jgrip)
@@ -126,25 +146,36 @@ if __name__ == "__main__":
 	        plt.plot(traj[:,axis])
 	        plt.show()
 
-	insertion = np.arange(0.075,0.095,0.5)
+	insertion = np.arange(0.075,0.177,0.001)
 	insertion = np.append(insertion,np.flip(insertion)[1::])
-
+        #insertion = insertion[121::]
 	for ins in insertion:
 	    pub.publish(ins)
+	    print('insertion = ',ins)
             p.arm.move_joint_one(float(ins),2,interpolate = True, blocking = True)
-
+	    # generate jaw motion
+ 	    jp = p.arm.get_desired_jaw_position()
+            jgrip = p.singleAxisTrajGen(0,0,p.num_wayPoints,[-math.pi*5/180,math.pi*5/180]) + jp
+            traj = p.traj_generate()
 	    dpoints = min(len(traj[:,1]),len(jgrip))
+	    while p.recState != 'Go':
+		pass
+	    time.sleep(2)
 	    curPos = p.arm.get_current_position()
-	    desPos = curPos
             for index in range(dpoints):
-		desPos = curPos
-		desPos.M.DoRotZ(traj[index,3])
-		desPos.p[0] = curPos.p[0]+traj[index,0]
-		desPos.p[1] = curPos.p[1]+traj[index,1]
-		desPos.p[2] = curPos.p[2]+traj[index,2]
-            	p.arm.move(desPos,interpolate = False, blocking = False)
+		desPos = PyKDL.Frame(curPos)
+		desPos.M.DoRotZ(traj[index,5])
+		desPos.M.DoRotX(traj[index,3])
+		desPos.M.DoRotY(traj[index,4])
+		desPos.p[0] = desPos.p[0]+traj[index,0]
+		desPos.p[1] = desPos.p[1]+traj[index,1]
+		desPos.p[2] = desPos.p[2]+traj[index,2]
+		p.arm.move(desPos,interpolate = False, blocking = False)
 		p.arm.move_jaw(jgrip[index],interpolate = False, blocking = False)
-                time.sleep(p.Ts)	
-	
-	p.arm.home()
+                time.sleep(p.Ts)
+	    #del curPos,desPos,jp,jgrip,dpoints 	
+	    p.localhome()
+
+        pub.publish(0)	
+	#p.home()
 

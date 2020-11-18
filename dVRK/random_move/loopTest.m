@@ -8,7 +8,7 @@ import zaber.motion.Units;
 Library.enableDeviceDbStore();
 %%
 % The rest of your program goes here
-connection = Connection.openSerialPort('/dev/ttyUSB2');
+connection = Connection.openSerialPort('/dev/ttyUSB0');
 h = uicontrol('Style', 'pushbutton', 'String', 'Stop', ...
     'Callback', 'delete(gcf)');
 drawnow()
