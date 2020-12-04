@@ -31,7 +31,7 @@ class psm_random_move_fast(object):
         # move the arm to a home position
         # The units are SI (rad for joints 0,1,3,4,5 and m for joint 2)
         # move all the axes to the start position defined below
-        self.home_pos = [3.4/180*math.pi,1.1/180*math.pi,0.075,0,0,0]
+        self.home_pos = [3.4/180*math.pi,1.1/180*math.pi,0.103,0,0,0]
         axis = 0
         for item in self.home_pos:
             self.arm.move_joint_one(float(item),axis,interpolate = True, blocking = True)
@@ -126,11 +126,11 @@ class psm_random_move_fast(object):
 
     def insertion(self):
 	q0 = [0]
-	q1 = [-0.08]
+	q1 = [0.12]
 	v0 = [0]
 	v1 = [0]
 
-	v_max = 0.003
+	v_max = 0.006
 	a_max = 0.5
 	j_max = 1.00
 
@@ -155,46 +155,33 @@ if __name__ == "__main__":
 	armname = 'PSM2';
 	rospy.init_node(str(armname+'_insertionPublisher'))
 	pub = rospy.Publisher('PSM2'+'/insertion',Float64, latch = True, queue_size = 1)
-
-	#axisIndex = np.array([2,3,4,5],dtype=np.int64);
-	#motion_rng = [[-0.03,0.03],[-math.pi/3,math.pi/3],[-math.pi/4,math.pi/4],[-math.pi/4,math.pi/4]]
-	axisIndex = [0,1,2,3,4,5]
-	motion_rng = [[-0.02,0.02],[-0.02,0.02],[-0.04,0.04],[-math.pi/3.2,math.pi/3.2],[-math.pi/3.2,math.pi/3.2],[-math.pi/3.2,math.pi/3.2]]
+	axisIndex = [0,1,2]
+	motion_rng = [[-0.02,0.02],[-0.02,0.02],[-0.04,0.04]]
 	p = psm_random_move_fast(armname,45,16,axisIndex,motion_rng,0.001)
 	p.home()
 	p.insertion()
-
-	if True:
+	
+	if False:
 	    plt.plot(p.z)
 	    plt.show()
 	    
-            #for axis in range(len(p.joints)):
-	    #    plt.plot(traj[:,axis])
-	    #    plt.show()
-	for i in range(25):
-            curPos = p.arm.get_current_position()
-	    jp = p.arm.get_desired_jaw_position()
-            jgrip = p.singleAxisTrajGen(0,0,p.num_wayPoints,[-math.pi*5/180,math.pi*5/180]) + jp
-	    traj = p.traj_generate()
-	    dpoints = min(len(p.z),len(traj[:,1]),len(jgrip))
-	    pub.publish(0.075)
+           
+	for i in range(3):
+            curJointPos = p.arm.get_current_joint_position()
+	    dpoints = len(p.z)
+	    pub.publish(0.103)
+	    desPos = p.z+curJointPos[2]; 
             while p.recState != 'Go':
                 pass
             time.sleep(3)
 	    for index in range(dpoints):
-		zaber_axis = 0.075-p.z[index]
+		zaber_axis = 0.103-p.z[index]
 		pub.publish(zaber_axis)
-		print('insertion = ',zaber_axis)
-		desPos = PyKDL.Frame(curPos)
-		desPos.M.DoRotZ(traj[index,5])
-		desPos.M.DoRotX(traj[index,3])
-		desPos.M.DoRotY(traj[index,4])
-		desPos.p[0] = desPos.p[0]+traj[index,0]
-		desPos.p[1] = desPos.p[1]+traj[index,1]
-		desPos.p[2] = desPos.p[2]+p.z[index]+traj[index,2]
-		p.arm.move(desPos,interpolate = False, blocking = False)
-		p.arm.move_jaw(jgrip[index],interpolate = False, blocking = False)
+		#print('insertion = ',zaber_axis)
+		p.arm.move_joint_some(desPos[index], [0,1,2], interpolate = False, blocking = False)		
         	time.sleep(p.Ts)
+	    
+	    time.sleep(3)
 	    pub.publish(0.065)
 	    p.home()
 	time.sleep(3)
