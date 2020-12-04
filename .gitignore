@@ -1,1 +1,8 @@
 *.asv
+data_gripper/*
+data_shaft/*
+Old_Data/*
+*.zip
+data_npe.mat
+data_ndspe.mat
+data_pe.mat
