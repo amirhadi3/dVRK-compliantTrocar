@@ -3,19 +3,28 @@ eplot_data = atiplot_data-Dplot_data;
 
 % plot poistion data
 figure;
-[ha, pos] = tight_subplot(1, 1, 0.065, 0.1, 0.05);
-set(gcf,'units','normalized','OuterPosition',[0 0.6 1 0.4]);
-sfh = subplot(ha);
-plot(tplot,posplot_data*1000,'b','linewidth',2);
+set(gcf,'units','normalized','OuterPosition',[0 0.2 1 0.8]);
+subplot(2,1,1)
+plot(tplot,posplot_data(:,1)*1000,'b','linewidth',2);
 grid on;
 ax = gca;
-ax.FontSize = 20;
+ax.FontSize = 14;
 set(gca,'linewidth',2)
 grid on;
 xlabel('Time(s)','fontweight','b');
 ylabel('q_3(m)','fontweight','b');
-set(gcf,'color','w')
-set(gcf, 'InvertHardCopy', 'off');
+
+
+subplot(2,1,2)
+plot(tplot,posplot_data(:,2)/pi*180,'b','linewidth',2);
+grid on;
+ax = gca;
+ax.FontSize = 14;
+set(gca,'linewidth',2)
+grid on;
+xlabel('Time(s)','fontweight','b');
+ylabel('q_4(deg.)','fontweight','b');
+
 if print_on
     print(sprintf('dispPlot%s',plot_suffix),'-djpeg','-r600');
 end
@@ -77,7 +86,6 @@ for axisNum=1:12
     end
     
     ax = gca;
-    ax.FontSize = 20;
     set(gca,'linewidth',2)
     grid on;
     %     legend ATI OFS Error
@@ -85,6 +93,7 @@ for axisNum=1:12
         set(gca,'XTickLabel',xticklabel);
         xlabel('Time(s)','fontweight','b');
     end
+    ax.FontSize = 14;
 end
 set(gcf,'color','w')
 set(gcf, 'InvertHardCopy', 'off');
@@ -129,7 +138,7 @@ for axisNum = 1:6
         ylabel('OFS','Fontsize',20,'fontweight','b');
     end
     txt = sprintf('R^2 = %4.3f',Rsq(axisNum));
-    text(-xmax/2,ymax/2,txt,'Fontsize',18,'fontweight','b');
+%     text(-xmax/2,ymax/2,txt,'Fontsize',18,'fontweight','b');
     title(titleList{axisNum},'Fontsize',24,'fontweight','b')
     axis square
 end
